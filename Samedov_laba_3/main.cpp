@@ -88,6 +88,16 @@ void DeleteTube(vector<Tube>& arrTube) {
 	}
 }
 
+void DeleteCs(vector<Cs>& arrCs) {
+	int command = inputPositiveInteger("Введите номер кс: ");
+	if (arrCs.size() < command) {
+		cout << "Количество кс меньше " << command << endl;
+	}
+	else {
+		arrCs.erase(arrCs.begin() + command - 1);
+	}
+}
+
 void View(vector<Tube>& arrTube, vector<Cs>& arrCs) {
 	int	idCs = 1;
 	int idTube = 1;
@@ -283,14 +293,15 @@ int main() {
 			"6. Сохранить в файл" << endl <<
 			"7. Загрузить в файл" << endl <<
 			"8. Удалить трубу" << endl <<
-			"9. Фильтр труб" << endl <<
-			"10. Фильтр станций" << endl <<
-			"11. Пакетное редактирование" << endl <<
+			"9. Удалить КС" << endl <<
+			"10. Фильтр труб" << endl <<
+			"11. Фильтр станций" << endl <<
+			"12. Пакетное редактирование" << endl <<
 			"0. Выход" << endl;
 		command = inputPositiveInteger("Введите номер команды: ");
-		while (command > 11)
+		while (command > 12)
 		{
-			cout << "Введенное число больше 11! ";
+			cout << "Введенное число больше 12! ";
 			command = inputPositiveInteger("Введите номер команды: ");
 		}
 		switch (command) {
@@ -336,15 +347,20 @@ int main() {
 		}
 		case 9:
 		{
-			FilterTube(arrTube);
+			DeleteCs(arrCs);
 			break;
 		}
 		case 10:
 		{
-			FilterCs(arrCs);
+			FilterTube(arrTube);
 			break;
 		}
 		case 11:
+		{
+			FilterCs(arrCs);
+			break;
+		}
+		case 12:
 		{
 			Packet(arrTube);
 			break;
