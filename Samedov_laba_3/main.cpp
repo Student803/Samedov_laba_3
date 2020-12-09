@@ -4,8 +4,9 @@
 #include <regex>	
 #include "Cs.h"
 #include "Tube.h"
+#include <unordered_map>
+#include "utils.h"
 using namespace std;
-
 
 
 
@@ -14,136 +15,78 @@ using namespace std;
 // + - от 1 до +беск
 // \ - спец. символ
 
-bool isPositiveFloat(const string& s)	
-{
-	const regex digit_regex("^[0-9]+(\,[0-9])?[0-9]*$");
-	return regex_match(s, digit_regex);
-}
 
-bool isPositiveInteger(const string& s)
-{
-	const regex digit_regex("^[0-9]+$");
-	return regex_match(s, digit_regex);
-}
 
-float inputPositiveFloat(const string& msg)
-{
-	char str[20];
-	bool first = true;
-	do {
-		if (!first) cout << "Некорректный ввод, введите еще раз >> ";
-		cout << msg;
-		cin >> str;
-		first = false;
-	} while (!isPositiveFloat(str));
-	return atof(str);	// atof возвращает float
-}
-
-int inputPositiveInteger(const string& msg) {
-	char str[20];
-	bool first = true;
-	do {
-		if (!first) cout << "Некорректный ввод, введите еще раз >> ";
-		cout << msg;
-		cin >> str;
-		first = false;
-	} while (!isPositiveInteger(str));
-	return atoi(str);	// atoi возвращает int
-}
-
-void AddTube(int& idTube, vector<Tube>& arrTube) {
+void AddTube(unordered_map<int, Tube>& mapTube) {
 	Tube tube1;
-	tube1.id = idTube;
 	tube1.length = inputPositiveFloat("Введите длину: ");
 	tube1.diam = inputPositiveFloat("Введите диаметр: ");
-	arrTube.push_back(tube1);
-	idTube++;
+	mapTube.insert(make_pair(tube1.GetId(), tube1));
 }
 
-void AddCs(int& idCs, vector<Cs>& arrCs) {
+void AddCs(unordered_map<int, Cs>& mapCs) {
 	Cs cs1;
-	cs1.id = idCs;
-	cout << "Введите наименование: ";
-	cin >> cs1.name;
-	cs1.quantity = inputPositiveInteger("Введите количество цехов: ");
-	int cur = inputPositiveInteger("Введите количество цехов в работе: ");
-	while (cur > cs1.quantity) {
-		cout << "Введенное число больше количества цехов! ";
-		cur = inputPositiveInteger("Введите количество цехов в работе: ");
-	}
-	cs1.quantityInWork = cur;
-	cs1.efficiency = inputPositiveFloat("Введите показатель эффективности: ");
-	cout << endl;
-	arrCs.push_back(cs1);
-	idCs++;
+	cin >> cs1;
+	mapCs.insert(make_pair(cs1.GetId(), cs1));
 }
 
-void DeleteTube(vector<Tube>& arrTube) {
-	int command = inputPositiveInteger("Введите номер трубы: ");
-	if (arrTube.size() < command) {
-		cout << "Количество труб меньше " << command << endl;
-	}
-	else {
-		arrTube.erase(arrTube.begin() + command - 1);
-	}
-}
-
-void DeleteCs(vector<Cs>& arrCs) {
-	int command = inputPositiveInteger("Введите номер кс: ");
-	if (arrCs.size() < command) {
-		cout << "Количество кс меньше " << command << endl;
-	}
-	else {
-		arrCs.erase(arrCs.begin() + command - 1);
-	}
-}
-
-void View(vector<Tube>& arrTube, vector<Cs>& arrCs) {
-	int	idCs = 1;
-	int idTube = 1;
-	for (auto &it : arrCs) {
-		cout << "Компрессорная станция №: " << idCs++ << endl;
-		cout << "Наименование: " << it.name << endl;
-		cout << "Количество цехов: " << it.quantity << endl;
-		cout << "Количество цехов в работе: " << it.quantityInWork << endl;
-		cout << "Показатель эффективности: " << it.efficiency << endl << endl;
-	}
-	for (auto &it : arrTube) {
-		cout << "Труба №: " << idTube++ << endl;
-		cout << "Длина: " << it.length << endl;
-		cout << "Диаметр: " << it.diam << endl;
-		if (!it.repaired)
-			cout << "В ремонте: нет" << endl << endl;
-		else
-			cout << "В ремонте: да" << endl << endl;
-	}
-}
-
-void EditTube(vector<Tube>& arrTube) {
+void DeleteTube(unordered_map<int, Tube>& mapTube) {
 	int id;
-	id = inputPositiveInteger("Введите номер трубы: ");
-	if (id > arrTube.size() || id < 1)
+	id = inputPositiveInteger("Введите id трубы: ");
+	if (mapTube.find(id) == mapTube.end())
 	{
-		cout << "Такой трубы не существует! " << endl;
+		cout << "Такой трубы не существует! ";
+	}
+	else {
+		mapTube.erase(mapTube.find(id));
+	}						
+}
+
+void DeleteCs(unordered_map<int, Cs>& mapCs) {
+	int id;
+	id = inputPositiveInteger("Введите id станции: ");
+	if (mapCs.find(id) == mapCs.end())
+	{
+		cout << "Такой станции не существует! ";
+	}
+	else {
+		mapCs.erase(mapCs.find(id));
+	}
+}
+
+void View(unordered_map<int, Tube>& mapTube, unordered_map<int, Cs>& mapCs) {
+
+	for (auto &it : mapCs) {
+		cout << it.second;
+	}
+	for (auto &it : mapTube) {
+		cout << it.second;
+	}
+}
+
+void EditTube(unordered_map<int, Tube>& mapTube) {
+	int id;
+	id = inputPositiveInteger("Введите id трубы: ");
+	if (mapTube.find(id) == mapTube.end())
+	{
+		cout << "Такой трубы не существует! ";
 	}
 	else
 	{
-		id = id - 1;
-		arrTube[id].Edit();
+		mapTube[id].Edit();
 	}
 }
 
-void EditCs(vector<Cs>& arrCs) {
+void EditCs(unordered_map<int, Cs>& mapCs) {
 	int id;
-	id = inputPositiveInteger("Введите номер КС: ");
-	if (id > arrCs.size() || id < 1)
+	id = inputPositiveInteger("Введите id КС: ");
+	if (mapCs.find(id) == mapCs.end())
 	{
-		cout << "Такой станции не существует! " << endl;
+		cout << "Такой станции не существует! ";
 	}
 	else
 	{
 		int n;
-		id = id - 1;
 		n = inputPositiveInteger("Введите 1, чтобы запустить цех, или 2, чтобы остановить цех: ");
 		while (n != 1 && n != 2)
 		{
@@ -151,138 +94,163 @@ void EditCs(vector<Cs>& arrCs) {
 			n = inputPositiveInteger("Введите номер команды: ");
 		}
 		if (n == 1)
-			arrCs[id].Launch();
+			mapCs[id].Launch();
 		else
-			arrCs[id].Stop();
+			mapCs[id].Stop();
 	}
 }
 
-void Save(vector<Tube>& arrTube, vector<Cs>& arrCs) {
-	ofstream outf("text.txt", ios::out);
-	if (!outf.is_open())
+void Save(unordered_map<int, Tube>& mapTube, unordered_map<int, Cs>& mapCs) {
+	ofstream fout("text.txt", ios::out);
+	if (!fout.is_open())
 		cout << "Файл не может быть открыт!\n";
 	else {
-		for (auto &it : arrTube) {
-			outf << "tube" << endl;
-			outf << it.id << endl;
-			outf << it.length << endl;
-			outf << it.diam << endl;
+		for (auto &it : mapTube) {
+			fout << it.second;
 		}
-		for (auto &it : arrCs) {
-			outf << "cs" << endl;
-			outf << it.id << endl;
-			outf << it.name << endl;
-			outf << it.quantity << endl;
-			outf << it.quantityInWork << endl;
-			outf << it.efficiency << endl;
+		for (auto &it : mapCs) {
+			fout << it.second;
 		}
 	}
-	outf.close();
+	fout.close();
 }
 
-void Load(vector<Tube>& arrTube, vector<Cs>& arrCs) {
+void Load(unordered_map<int, Tube>& mapTube, unordered_map<int, Cs>& mapCs) {
 	ifstream fin("text.txt");
+	int id;
 	if (!fin.is_open())
 		cout << "Файл не может быть открыт!\n";
 	else
 	{
+		mapTube.clear();
+		mapCs.clear();
 		string buff;
+		int maxid1 = 1;
+		int maxid2 = 1;
 		while (fin >> buff) {
 			if (buff == "tube") {
-				Tube tube1;
-				fin >> tube1.id >> tube1.length >> tube1.diam;
-				arrTube.push_back(tube1);
+				Tube tube1(-1);
+				fin >> tube1;
+				mapTube.insert(make_pair(tube1.GetId(), tube1));
+				if (maxid1 < tube1.GetId()) maxid1 = tube1.GetId() + 1;
 			}
 			if (buff == "cs") {
-				Cs cs1;
-				fin >> cs1.id >> cs1.name >> cs1.quantity >> cs1.quantityInWork >> cs1.efficiency;
-				arrCs.push_back(cs1);
+				Cs cs1(-1);
+				fin >> cs1;
+				mapCs.insert(make_pair(cs1.GetId(), cs1));
+				if (maxid2 < cs1.GetId()) maxid2 = cs1.GetId() + 1;
 			}
 		}
+		Tube::MAX_ID = maxid1;
+		Cs::MAX_ID = maxid2;
 	}
 	fin.close();
 }
 
-void FilterTube(vector<Tube>& arrTube) {
+void FilterTube(unordered_map<int, Tube>& mapTube) {
 	int n = inputPositiveInteger("Введите 1 для в ремонте: да или 2 для в ремонте: нет: ");
 	while (n < 1 || n > 2) {
 		int n = inputPositiveInteger("Введите 1 для в ремонте: да или 2 для в ремонте: нет: ");
 	}
 	if (n == 1) {
-		for (auto &it : arrTube) {
-			int idTube = 0;
-			idTube++;
-			if (it.repaired == true) {
-				cout << "Труба №: " << idTube << endl;
-				cout << "Длина: " << it.length << endl;
-				cout << "Диаметр: " << it.diam << endl;
+		for (auto &it : mapTube) {
+			if (it.second.repaired == true) {
+				cout << "Длина: " << it.second.length << endl;
+				cout << "Диаметр: " << it.second.diam << endl;
 				cout << "В ремонте: да" << endl << endl;
 			}
 		}
 	}
 	if (n == 2) {
-		for (auto& it : arrTube) {
-			int idTube = 0;
-			idTube++;
-			if (it.repaired == false) {
-				cout << "Труба №: " << idTube << endl;
-				cout << "Длина: " << it.length << endl;
-				cout << "Диаметр: " << it.diam << endl;
+		for (auto& it : mapTube) {
+			if (it.second.repaired == false) {
+				cout << "Длина: " << it.second.length << endl;
+				cout << "Диаметр: " << it.second.diam << endl;
 				cout << "В ремонте: нет" << endl << endl;
 			}
 		}
 	}
 }
 
-void FilterCs(vector<Cs>& arrCs) {
+void FilterCs(unordered_map<int, Cs>& mapCs) {
 	
 	string name;
 	cout << "Введите название станции: " << endl;
 	cin >> name; 
-	int	idCs = 1;
-	for (auto it : arrCs) {
-		if (name == it.name) {
-			cout << "Компрессорная станция №: " << idCs++ << endl;
-			cout << "Наименование: " << it.name << endl;
-			cout << "Количество цехов: " << it.quantity << endl;
-			cout << "Количество цехов в работе: " << it.quantityInWork << endl;
-			cout << "Показатель эффективности: " << it.efficiency << endl << endl;
+	for (auto it : mapCs) {
+		if (name == it.second.name) {
+			cout << "Наименование: " << it.second.name << endl;
+			cout << "Количество цехов: " << it.second.quantity << endl;
+			cout << "Количество цехов в работе: " << it.second.quantityInWork << endl;
+			cout << "Показатель эффективности: " << it.second.efficiency << endl << endl;
 		}
 	}
 }
 
-void Packet(vector<Tube>& arrTube) {
+void Packet(unordered_map<int, Tube>& mapTube) {
 	vector<int> arr;
 	int q;
 	q = inputPositiveInteger("Введите количество элементов, которые нужно изменить: ");
-	while (q > arrTube.size()) {
+	while (q > mapTube.size()) {
 		cout << "Элементов меньше, чем введённое количество" << endl;
 		q = inputPositiveInteger("Введите количество элементов, которые нужно изменить");
 	}
 	cout << "Введите номера id: ";
 	for (int i = 0; i < q; i++) {
-		int n;
-		n = inputPositiveInteger("");
-		while (n > arrTube.size()) {
-			n = inputPositiveInteger("Введите ещё раз: ");
+		int id;
+		id = inputPositiveInteger("");
+		while (mapTube.find(id) == mapTube.end()) {
+			id = inputPositiveInteger("Введите ещё раз: ");
 		}
-		arr.push_back(n);
+		arr.push_back(id);
 	}
 	for (auto& it : arr) {
 			cout << "Длина: ";
-			cin >> arrTube[it-1].length;
+			cin >> mapTube[it].length;
 			cout << "Диаметр: ";
-			cin >> arrTube[it-1].diam;
+			cin >> mapTube[it].diam;
 			cout << endl;
 	}
 }
 
+void Graph(vector<Tube>& arrTube, vector<Cs>& arrCs, vector<vector<int>>& arr) {
+	int n = inputPositiveInteger("Нажмите 1, чтобы обнулить матрицу смежности: ");
+		if (n == 1) {
+			arr.resize(arrCs.size());
+			for (int i = 0; i < arrCs.size(); i++) {
+				arr[i].resize(arrCs.size());
+				for (int k = 0; k < arrCs.size(); k++) {
+					arr[i][k] = 0;
+				}
+			}
+		}
+		int i1;
+		int i2;
+		i1 = inputPositiveInteger("Введите номер id кс, от которого идёт труба: ");
+		i2 = inputPositiveInteger("Введите номер id кс, к которому идёт труба: ");
+		if (i1 > arrCs.size() || i2 > arrCs.size()) {
+			cout << "Количество труб меньше" << endl;
+		}
+		else
+		arr[i1 - 1][i2 - 1] = 1;
+}
+
+void ViewGraph(vector<vector<int>>& arr) {
+	for (int i = 0; i < arr.size(); i++) {
+		for (int k = 0; k < arr.size(); k++) {
+			cout << arr[i][k] << " ";
+		}
+		cout << endl;
+	}
+}
+
+
+
 int main() {
 	setlocale(LC_ALL, "Russian");
-	vector<Cs> arrCs;
-	vector<Tube> arrTube;
-	int	idCs = 1;
-	int idTube = 1;
+	unordered_map<int, Tube> mapTube;
+	unordered_map<int, Cs> mapCs;
+	vector<vector<int>> arr;
 	for (;;) {
 		int command;
 		cout << "1. Добавить трубу" << endl <<
@@ -307,62 +275,62 @@ int main() {
 		switch (command) {
 		case 1:
 		{
-			AddTube(idTube, arrTube);
+			AddTube(mapTube);
 			break;
 		}
 		case 2:
 		{
-			AddCs(idCs, arrCs);
+			AddCs(mapCs);
 			break;
 		}
 		case 3:
 		{
-			View(arrTube, arrCs);
+			View(mapTube, mapCs);
 			break;
 		}
 		case 4:
 		{
-			EditTube(arrTube);
+			EditTube(mapTube);
 			break;
 		}
 		case 5:
 		{
-			EditCs(arrCs);
+			EditCs(mapCs);
 			break;
 		}
 		case 6:
 		{
-			Save(arrTube, arrCs);
+			Save(mapTube, mapCs);
 			break;
 		}
 		case 7:
 		{
-			Load(arrTube, arrCs);
+			Load(mapTube, mapCs);
 			break;
 		}
 		case 8:
 		{
-			DeleteTube(arrTube);
+			DeleteTube(mapTube);
 			break;
 		}
 		case 9:
 		{
-			DeleteCs(arrCs);
+			DeleteCs(mapCs);
 			break;
 		}
 		case 10:
 		{
-			FilterTube(arrTube);
+			FilterTube(mapTube);
 			break;
 		}
 		case 11:
 		{
-			FilterCs(arrCs);
+			FilterCs(mapCs);
 			break;
 		}
 		case 12:
 		{
-			Packet(arrTube);
+			Packet(mapTube);
 			break;
 		}
 		case 0:
@@ -370,3 +338,7 @@ int main() {
 		}
 	}
 }
+
+// Перегрузка операторов
+// id сделать private
+// векторы поменять на мапы
