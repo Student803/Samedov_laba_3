@@ -46,9 +46,9 @@ std::ifstream& operator >> (std::ifstream& fin, Tube& tube)
 
 std::ofstream& operator << (std::ofstream& fout, Tube& tube)
 {
-	fout << "tube" << endl;
-	fout << tube.id << endl;
-	fout << tube.length << endl;
+	fout << "tube" << " ";
+	fout << tube.id << " ";
+	fout << tube.length << " ";
 	fout << tube.diam<< endl;
 	return fout;
 }

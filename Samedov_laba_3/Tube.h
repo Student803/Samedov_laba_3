@@ -16,6 +16,7 @@ public:
 	void Edit();
 	int GetId();
 	void SetId(int id);
+	bool used = false;
 	friend std::ostream& operator << (std::ostream& out, const Tube& tube);
 	friend std::ifstream& operator >> (std::ifstream& fin, Tube& tube);
 	friend std::ofstream& operator << (std::ofstream& fout, Tube& tube);

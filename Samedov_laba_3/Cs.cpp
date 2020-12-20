@@ -53,11 +53,11 @@ std::ifstream& operator >> (std::ifstream& fin, Cs& cs)
 
 std::ofstream& operator << (std::ofstream& fout, Cs& cs)
 {
-	fout << "cs" << endl;
-	fout << cs.id << endl;
-	fout << cs.name << endl;
-	fout << cs.quantity << endl;
-	fout << cs.quantityInWork << endl;
+	fout << "cs" << " ";
+	fout << cs.id << " ";
+	fout << cs.name << " ";
+	fout << cs.quantity << " ";
+	fout << cs.quantityInWork << " ";
 	fout << cs.efficiency << endl;
 	return fout;
 }
